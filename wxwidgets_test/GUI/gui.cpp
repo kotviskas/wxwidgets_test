@@ -118,11 +118,19 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxBoxSizer* bSizer81;
 	bSizer81 = new wxBoxSizer( wxVERTICAL );
 
-	m_toolBar2 = new wxToolBar( m_panel91, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL );
-	m_tool3 = m_toolBar2->AddTool( wxID_ANY, _("tool"), wxArtProvider::GetBitmap( wxART_GO_UP, wxART_TOOLBAR ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL );
+	m_toolBar2 = new wxToolBar( m_panel91, wxID_ANY, wxDefaultPosition, wxSize( 40,-1 ), wxTB_HORIZONTAL );
+	m_bmToggleBtn1 = new wxBitmapToggleButton( m_toolBar2, wxID_ANY, wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_TOOLBAR ), wxDefaultPosition, wxSize( 40,40 ), 0 );
 
-	m_tool4 = m_toolBar2->AddTool( wxID_ANY, _("tool"), wxArtProvider::GetBitmap( wxART_GO_DOWN, wxART_TOOLBAR ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL );
+	m_bmToggleBtn1->SetBitmap( wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_TOOLBAR ) );
+	m_bmToggleBtn1->SetBitmapDisabled( wxArtProvider::GetBitmap( wxART_GO_BACK, wxART_TOOLBAR ) );
+	m_bmToggleBtn1->SetBitmapPressed( wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_TOOLBAR ) );
+	m_toolBar2->AddControl( m_bmToggleBtn1 );
+	m_bmToggleBtn2 = new wxBitmapToggleButton( m_toolBar2, wxID_ANY, wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_TOOLBAR ), wxDefaultPosition, wxSize( 40,40 ), 0 );
 
+	m_bmToggleBtn2->SetBitmap( wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_TOOLBAR ) );
+	m_bmToggleBtn2->SetBitmapDisabled( wxArtProvider::GetBitmap( wxART_GO_BACK, wxART_TOOLBAR ) );
+	m_bmToggleBtn2->SetBitmapPressed( wxArtProvider::GetBitmap( wxART_FILE_OPEN, wxART_TOOLBAR ) );
+	m_toolBar2->AddControl( m_bmToggleBtn2 );
 	m_toolBar2->Realize();
 
 	bSizer81->Add( m_toolBar2, 0, wxEXPAND, 0 );
@@ -188,8 +196,16 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	this->Layout();
 
 	this->Centre( wxBOTH );
+
+	// Connect Events
+	m_bmToggleBtn1->Connect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( MainFrame::OnNameSort ), NULL, this );
+	m_bmToggleBtn2->Connect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( MainFrame::OnImageFilter ), NULL, this );
 }
 
 MainFrame::~MainFrame()
 {
+	// Disconnect Events
+	m_bmToggleBtn1->Disconnect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( MainFrame::OnNameSort ), NULL, this );
+	m_bmToggleBtn2->Disconnect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( MainFrame::OnImageFilter ), NULL, this );
+
 }

@@ -1,5 +1,6 @@
 #include "guiMainFrame.h"
 #include <wx/msgdlg.h>
+
 enum
 {
     ID_About = 1,
@@ -34,55 +35,44 @@ guiMainFrame::guiMainFrame(wxWindow* parent)
 
     // Grid
     int nrows, ncols;
-    nrows = 2; ncols = 2;
-
-    LayoutGridItem item1;
-    item1.name = "1";
-    item1.icon = add_bitmap;
-    item1.checkbox = false;
-
-    m_grid1->AppendCols(ncols);
-    m_grid1->AppendRows(nrows);
-    m_grid1->EnableEditing(true);
-    m_grid1->EnableGridLines(true);
-    // Columns
-    m_grid1->SetColLabelValue(0, _("name"));
-    m_grid1->SetColLabelValue(1, _("art"));
-    m_grid1->SetColLabelValue(2, _("checkbox"));
+    nrows = 5; ncols = 3;
+    gridTable = new MyGridTable(5, 3, m_grid1);
+    for (int row = 0; row < gridTable->GetNumberRows(); ++row) {
+        for (int col = 0; col < gridTable->GetNumberCols(); ++col) {
+            if (col == 0) {
+                gridTable->SetValue(row, col, wxString::Format("Row %d, Col %d", row + 1, col + 1));
+            }
+            else if (col == 1) {
+                // Пример: Четные строки с изображением, нечетные без
+                wxString imageValue = (row % 2 == 0) ? "1" : "0";
+                gridTable->SetValue(row, col, imageValue);
+                m_grid1->SetReadOnly(row, col, true);
+            }
+            else if (col == 2) {
+                // Пример: Четные столбцы с флажками, нечетные без
+                wxString checkboxValue = (row % 2 == 0) ? "1" : "0";
+                gridTable->SetValue(row, col, checkboxValue);
+            }
+        }
+    }
+    m_grid1->SetTable(gridTable, true, wxGrid::wxGridSelectRows);
+    //wxGridCellBoolEditor* boolEditor = new wxGridCellBoolEditor();
+    for (int row = 0; row < gridTable->GetNumberRows(); ++row) {
+        m_grid1->SetCellRenderer(row, 1, new ImageRenderer());
+        m_grid1->SetReadOnly(row, 1, true);
+        m_grid1->SetReadOnly(row, 0, true);
+    }
+    //m_grid1->SetCellEditor(0, 2, boolEditor);
     // Rows
     m_grid1->SetRowLabelSize(0);
-
-    m_grid1->SetCellValue(0, 0, "name");
-
-    /*
-    wxDataViewTextRenderer* tr =
-        new wxDataViewTextRenderer("string", wxDATAVIEW_CELL_INERT);
-    wxDataViewColumn* column0 =
-        new wxDataViewColumn("title", tr, 0, 200, wxALIGN_LEFT,
-            wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_RESIZABLE);*/
     
     wxDataViewCtrl* dataViewCtrl = new wxDataViewCtrl(m_panel6, ID_MUSIC_CTRL, wxDefaultPosition, wxDefaultSize, wxDV_MULTIPLE | wxDV_NO_HEADER);
-    //dataModel = new MyDataModel;
-    //dataViewCtrl->AssociateModel(static_cast<wxDataViewModel*>(dataModel.get()));
-    
     treeModel = new TreeModel;
     dataViewCtrl->AssociateModel(treeModel.get());
-    
     //m_music_model = new MusicModel;
     //dataViewCtrl->AssociateModel(m_music_model.get());
-   
-    
-    //treeStore = new TreeStoreModel;
-    //dataViewCtrl->AssociateModel(treeStore.get());
-    //wxDataViewItem rootItem(static_cast<void*>(treeStore->GetRootItem()));
-    //dataViewCtrl->AppendContainer(rootItem, "Root");
-
-    //wxDataViewColumn* col1 = new wxDataViewColumn("Column 1", new wxDataViewTextRenderer(), 0, wxCOL_WIDTH_AUTOSIZE);
     wxDataViewColumn* col1 = new wxDataViewColumn("Column 1", new wxDataViewTextRenderer("string", wxDATAVIEW_CELL_INERT), 0, wxCOL_WIDTH_AUTOSIZE);
-    //wxDataViewColumn* col2 = new wxDataViewColumn("Column 2", new wxDataViewTextRenderer("long", wxDATAVIEW_CELL_INERT), 1, wxCOL_WIDTH_AUTOSIZE);
     dataViewCtrl->AppendColumn(col1);
-    //dataViewCtrl->AppendColumn(col2);
-
     wxSizer* firstPanelSz = new wxBoxSizer(wxVERTICAL);
     dataViewCtrl->SetMinSize(wxSize(-1, 200));
     firstPanelSz->Add(dataViewCtrl, 1, wxEXPAND);
@@ -98,6 +88,18 @@ void guiMainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
     wxMessageBox("This is information about app",
         "Title", wxOK | wxICON_INFORMATION);
+}
+
+void guiMainFrame::OnNameSort(wxCommandEvent& event)
+{
+    isNameSorted = !isNameSorted;
+    gridTable->SortByName(isNameSorted);
+}
+
+void guiMainFrame::OnImageFilter(wxCommandEvent& event)
+{
+    isFilterImage = !isFilterImage;
+    gridTable->FilterByImage(isFilterImage);
 }
 
 void guiMainFrame::build_tree()
@@ -133,9 +135,33 @@ void guiMainFrame::build_tree()
     tree_add(definitions2, "14", 14);
 }
 
+void guiMainFrame::UpdateGrid()
+{
+    m_grid1->SetTable(nullptr);
+    MyGridTable* myGridTable = dynamic_cast<MyGridTable*>(m_grid1->GetTable());
+
+    if (myGridTable) {
+        myGridTable->SetData(gridTable->GetData());
+        for (int row = 0; row < gridTable->GetNumberRows(); ++row) {
+            m_grid1->SetCellRenderer(row, 1, new ImageRenderer());
+            m_grid1->SetReadOnly(row, 1, true);
+            m_grid1->SetReadOnly(row, 0, true);
+        }
+    }
+    else {
+        
+    }
+    m_grid1->ForceRefresh(); 
+    m_grid1->Update();
+    m_grid1->AutoSizeColumns();
+    m_grid1->Layout();
+}
+
+
 wxTreeItemId guiMainFrame::tree_add(const wxTreeItemId& parent, const wxString& text, int tree_node)
 {
     wxTreeItemId id = m_treeCtrl1->AppendItem(parent, text);
     tree_data.insert(std::pair<int, wxTreeItemId>(tree_node, id));
     return id;
 }
+

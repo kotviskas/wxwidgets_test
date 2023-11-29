@@ -24,6 +24,7 @@
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
+#include <wx/tglbtn.h>
 #include <wx/grid.h>
 #include <wx/splitter.h>
 #include <wx/notebook.h>
@@ -61,10 +62,15 @@ class MainFrame : public wxFrame
 		wxPanel* m_panel81;
 		wxPanel* m_panel91;
 		wxToolBar* m_toolBar2;
-		wxToolBarToolBase* m_tool3;
-		wxToolBarToolBase* m_tool4;
+		wxBitmapToggleButton* m_bmToggleBtn1;
+		wxBitmapToggleButton* m_bmToggleBtn2;
 		wxGrid* m_grid1;
 		wxPanel* m_panel6;
+
+		// Virtual event handlers, override them in your derived class
+		virtual void OnNameSort( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnImageFilter( wxCommandEvent& event ) { event.Skip(); }
+
 
 	public:
 

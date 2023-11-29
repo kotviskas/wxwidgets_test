@@ -141,24 +141,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ImageRenderer.h" />
+    <ClInclude Include="MyGridTable.h" />
     <ClInclude Include="treeModel.h" />
     <ClInclude Include="GUI\gui.h" />
     <ClInclude Include="GUI\guiMainFrame.h" />
     <ClInclude Include="models.h" />
-    <ClInclude Include="newmodel.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="App.h" />
-    <ClInclude Include="treeStore.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ImageRenderer.cpp" />
+    <ClCompile Include="MyGridTable.cpp" />
     <ClCompile Include="treeModel.cpp" />
     <ClCompile Include="GUI\gui.cpp" />
     <ClCompile Include="GUI\guiMainFrame.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="models.cpp" />
-    <ClCompile Include="newmodel.cpp" />
-    <ClCompile Include="treeStore.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GUI\gui.fbp" />
