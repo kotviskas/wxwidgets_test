@@ -1,5 +1,8 @@
 #include "guiMainFrame.h"
 #include <wx/msgdlg.h>
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 enum
 {
@@ -11,72 +14,122 @@ guiMainFrame::guiMainFrame(wxWindow* parent)
 	:
 	MainFrame(parent)
 {
-    //toolbar
-	wxImage::AddHandler(new wxPNGHandler);
-	wxBitmap add_bitmap(wxT("add.png"), wxBITMAP_TYPE_PNG);
-	wxBitmap print_bitmap(wxT("print.png"), wxBITMAP_TYPE_PNG);
-	tool_add->SetNormalBitmap(add_bitmap);
-	tool_print->SetNormalBitmap(print_bitmap);
-    t_main->Realize();
+    try { 
+        json jsonInput = json::parse(R"(
+        {
+            "name": "Folder",
+            "type": "folder",
+            "children": [
+                    {
+                        "name": "Folder 1",
+                        "type": "folder",
+                        "children": [
+                            {
+                                "name": "File 1-1",
+                                "type": "file",
+                                "size": 1024
+                            },
+                            {
+                                "name": "File 1-2",
+                                "type": "file",
+                                "size": 512
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Folder 2",
+                        "type": "folder",
+                        "children": [
+                            {
+                                "name": "File 2-1",
+                                "type": "file",
+                                "size": 2048
+                            }
+                        ]
+                    },
+                    {
+                        "name": "File 3",
+                        "type": "file",
+                        "size": 256
+                    }
+                ]
+        }
+        )");
 
-    //treectrl
-    build_tree();
+        //toolbar
+        wxImage::AddHandler(new wxPNGHandler);
+        wxBitmap add_bitmap(wxT("add.png"), wxBITMAP_TYPE_PNG);
+        wxBitmap print_bitmap(wxT("print.png"), wxBITMAP_TYPE_PNG);
+        tool_add->SetNormalBitmap(add_bitmap);
+        tool_print->SetNormalBitmap(print_bitmap);
+        t_main->Realize();
 
-    //menu
-    menu_file_close = new wxMenu();
-    wxMenuItem* menu_file_closeItem = new wxMenuItem(menu_file, wxID_EXIT, "&Close program\tCtrl+W");
-    menu_file->Append(menu_file_closeItem);
-    menu_help_about = new wxMenu();
-    wxMenuItem* menu_help_abouItem = new wxMenuItem(menu_help, ID_About, "&About program");
-    menu_help->Append(menu_help_abouItem);
+        //treectrl
+        build_tree();
 
-    Bind(wxEVT_MENU, &guiMainFrame::OnQuit, this, wxID_EXIT);
-    Bind(wxEVT_MENU, &guiMainFrame::OnAbout, this, ID_About);
+        //menu
+        menu_file_close = new wxMenu();
+        wxMenuItem* menu_file_closeItem = new wxMenuItem(menu_file, wxID_EXIT, "&Close program\tCtrl+W");
+        menu_file->Append(menu_file_closeItem);
+        menu_help_about = new wxMenu();
+        wxMenuItem* menu_help_abouItem = new wxMenuItem(menu_help, ID_About, "&About program");
+        menu_help->Append(menu_help_abouItem);
 
-    // Grid
-    int nrows, ncols;
-    nrows = 5; ncols = 3;
-    gridTable = new MyGridTable(5, 3, m_grid1);
-    for (int row = 0; row < gridTable->GetNumberRows(); ++row) {
-        for (int col = 0; col < gridTable->GetNumberCols(); ++col) {
-            if (col == 0) {
-                gridTable->SetValue(row, col, wxString::Format("Row %d, Col %d", row + 1, col + 1));
-            }
-            else if (col == 1) {
-                // Пример: Четные строки с изображением, нечетные без
-                wxString imageValue = (row % 2 == 0) ? "1" : "0";
-                gridTable->SetValue(row, col, imageValue);
-                m_grid1->SetReadOnly(row, col, true);
-            }
-            else if (col == 2) {
-                // Пример: Четные столбцы с флажками, нечетные без
-                wxString checkboxValue = (row % 2 == 0) ? "1" : "0";
-                gridTable->SetValue(row, col, checkboxValue);
+        Bind(wxEVT_MENU, &guiMainFrame::OnQuit, this, wxID_EXIT);
+        Bind(wxEVT_MENU, &guiMainFrame::OnAbout, this, ID_About);
+
+        // Grid
+        int nrows, ncols;
+        nrows = 5; ncols = 3;
+        gridTable = new MyGridTable(5, 3, m_grid1);
+        for (int row = 0; row < gridTable->GetNumberRows(); ++row) {
+            for (int col = 0; col < gridTable->GetNumberCols(); ++col) {
+                if (col == 0) {
+                    gridTable->SetValue(row, col, wxString::Format("Row %d, Col %d", row + 1, col + 1));
+                }
+                else if (col == 1) {
+                    // Пример: Четные строки с изображением, нечетные без
+                    wxString imageValue = (row % 2 == 0) ? "1" : "0";
+                    gridTable->SetValue(row, col, imageValue);
+                    m_grid1->SetReadOnly(row, col, true);
+                }
+                else if (col == 2) {
+                    // Пример: Четные столбцы с флажками, нечетные без
+                    wxString checkboxValue = (row % 2 == 0) ? "1" : "0";
+                    gridTable->SetValue(row, col, checkboxValue);
+                }
             }
         }
+        m_grid1->SetTable(gridTable, true, wxGrid::wxGridSelectRows);
+        //wxGridCellBoolEditor* boolEditor = new wxGridCellBoolEditor();
+        for (int row = 0; row < gridTable->GetNumberRows(); ++row) {
+            m_grid1->SetCellRenderer(row, 1, new ImageRenderer());
+            m_grid1->SetReadOnly(row, 1, true);
+            m_grid1->SetReadOnly(row, 0, true);
+        }
+        //m_grid1->SetCellEditor(0, 2, boolEditor);
+        // Rows
+        m_grid1->SetRowLabelSize(0);
+
+        wxDataViewCtrl* dataViewCtrl = new wxDataViewCtrl(m_panel6, ID_MUSIC_CTRL, wxDefaultPosition, wxDefaultSize, wxDV_MULTIPLE | wxDV_NO_HEADER);
+        //treeModel = new TreeModel;
+        //dataViewCtrl->AssociateModel(treeModel.get());
+        //m_music_model = new MusicModel;
+        //dataViewCtrl->AssociateModel(m_music_model.get());
+        music_model = new ProjectModel;
+        JsonToMusicNode(jsonInput, music_model.get()->m_root);
+        dataViewCtrl->AssociateModel(music_model.get());
+        wxDataViewColumn* col1 = new wxDataViewColumn("Column 1", new wxDataViewTextRenderer("string", wxDATAVIEW_CELL_INERT), 0, wxCOL_WIDTH_AUTOSIZE);
+        dataViewCtrl->AppendColumn(col1);
+
+        wxSizer* firstPanelSz = new wxBoxSizer(wxVERTICAL);
+        dataViewCtrl->SetMinSize(wxSize(-1, 200));
+        firstPanelSz->Add(dataViewCtrl, 1, wxEXPAND);
+        m_panel6->SetSizerAndFit(firstPanelSz);
     }
-    m_grid1->SetTable(gridTable, true, wxGrid::wxGridSelectRows);
-    //wxGridCellBoolEditor* boolEditor = new wxGridCellBoolEditor();
-    for (int row = 0; row < gridTable->GetNumberRows(); ++row) {
-        m_grid1->SetCellRenderer(row, 1, new ImageRenderer());
-        m_grid1->SetReadOnly(row, 1, true);
-        m_grid1->SetReadOnly(row, 0, true);
+    catch (const std::exception& e) {
+        wxLogError("Exception: %s", wxString(e.what(), wxConvUTF8));
     }
-    //m_grid1->SetCellEditor(0, 2, boolEditor);
-    // Rows
-    m_grid1->SetRowLabelSize(0);
-    
-    wxDataViewCtrl* dataViewCtrl = new wxDataViewCtrl(m_panel6, ID_MUSIC_CTRL, wxDefaultPosition, wxDefaultSize, wxDV_MULTIPLE | wxDV_NO_HEADER);
-    treeModel = new TreeModel;
-    dataViewCtrl->AssociateModel(treeModel.get());
-    //m_music_model = new MusicModel;
-    //dataViewCtrl->AssociateModel(m_music_model.get());
-    wxDataViewColumn* col1 = new wxDataViewColumn("Column 1", new wxDataViewTextRenderer("string", wxDATAVIEW_CELL_INERT), 0, wxCOL_WIDTH_AUTOSIZE);
-    dataViewCtrl->AppendColumn(col1);
-    wxSizer* firstPanelSz = new wxBoxSizer(wxVERTICAL);
-    dataViewCtrl->SetMinSize(wxSize(-1, 200));
-    firstPanelSz->Add(dataViewCtrl, 1, wxEXPAND);
-    m_panel6->SetSizerAndFit(firstPanelSz);
 }
 
 void guiMainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
@@ -165,3 +218,20 @@ wxTreeItemId guiMainFrame::tree_add(const wxTreeItemId& parent, const wxString& 
     return id;
 }
 
+// Function to convert JSON to ProjectNode
+void guiMainFrame::JsonToMusicNode(const json& jsonData, ProjectNode* parent) {
+    try {
+        std::string name = jsonData.value("name", "");
+        ProjectNode* node = new ProjectNode(wxString(name.c_str(), wxConvUTF8));
+
+        const auto& children = jsonData.value("children", json::array());
+        for (const auto& childData : children) {
+            JsonToMusicNode(childData, node);
+        }
+
+        parent->AddChild(node);
+    }
+    catch (const std::exception& e) {
+        wxLogError("Exception: %s", wxString(e.what(), wxConvUTF8));
+    }
+}

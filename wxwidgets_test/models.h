@@ -2,38 +2,35 @@
 #include <wx/string.h>
 #include <wx/wx.h>
 #include <wx/dataview.h>
+#include "nlohmann/json.hpp"
 
-class MusicNode;
-WX_DEFINE_ARRAY_PTR(MusicNode*, MyMusicTreeModelNodePtrArray);
+using json = nlohmann::json;
 
-class MusicNode
+class MusicNode1;
+WX_DEFINE_ARRAY_PTR(MusicNode1*, MyMusicTreeModelNodePtrArray);
+
+class MusicNode1
 {
 public:
-    MusicNode(MusicNode* parent,
+    MusicNode1(MusicNode1* parent,
         const wxString& branch)
     {
         m_parent = parent;
         m_title = branch;
-        m_container = true;
     }
 
-    ~MusicNode()
+    ~MusicNode1()
     {
         // free all our children nodes
         size_t count = m_children.GetCount();
         for (size_t i = 0; i < count; i++)
         {
-            MusicNode* child = m_children[i];
+            MusicNode1* child = m_children[i];
             delete child;
         }
     }
 
-    bool IsContainer() const
-    {
-        return m_container;
-    }
-
-    MusicNode* GetParent()
+    MusicNode1* GetParent()
     {
         return m_parent;
     }
@@ -41,15 +38,15 @@ public:
     {
         return m_children;
     }
-    MusicNode* GetNthChild(unsigned int n)
+    MusicNode1* GetNthChild(unsigned int n)
     {
         return m_children.Item(n);
     }
-    void Insert(MusicNode* child, unsigned int n)
+    void Insert(MusicNode1* child, unsigned int n)
     {
         m_children.Insert(child, n);
     }
-    void Append(MusicNode* child)
+    void Append(MusicNode1* child)
     {
         m_children.Add(child);
     }
@@ -60,22 +57,17 @@ public:
 
 public:     // public to avoid getters/setters
     wxString                m_title;
-    wxString                m_artist;
-    int                     m_year;
-    wxString                m_quality;
-    bool m_container;
-
 private:
-    MusicNode* m_parent;
+    MusicNode1* m_parent;
     MyMusicTreeModelNodePtrArray   m_children;
 };
 
 
-class MusicModel: public wxDataViewModel
+class MusicModel1: public wxDataViewModel
 {
 public:
-    MusicModel();
-    ~MusicModel()
+    MusicModel1();
+    ~MusicModel1()
     {
         delete m_root;
     }
@@ -83,14 +75,13 @@ public:
     // helper method for wxLog
     wxString GetTitle(const wxDataViewItem& item) const;
 
-    // helper methods to change the model
-    void AddToClassical(const wxString& title);
-    void Delete(const wxDataViewItem& item);
-
     // implementation of base class virtuals to define model
     virtual unsigned int GetColumnCount() const
     {
-        return 6;
+        return 1;
+    }
+    virtual wxString GetColumnType(unsigned int col) const {
+        return "string";
     }
 
     virtual void GetValue(wxVariant& variant,
@@ -103,9 +94,6 @@ public:
         wxDataViewItemArray& array) const;
 
 private:
-    MusicNode* m_root;
-    // pointers to some "special" nodes of the tree:
-    MusicNode* m_pop;
-    MusicNode* m_classical;
+    MusicNode1* m_root;
 };
 

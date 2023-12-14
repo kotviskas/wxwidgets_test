@@ -57,7 +57,7 @@
             <property name="window_name"></property>
             <property name="window_style">wxTAB_TRAVERSAL</property>
             <property name="xrc_skip_sizer">1</property>
-            <object class="wxMenuBar" expanded="1">
+            <object class="wxMenuBar" expanded="0">
                 <property name="bg">wxSYS_COLOUR_WINDOW</property>
                 <property name="context_help"></property>
                 <property name="context_menu">1</property>
@@ -78,22 +78,22 @@
                 <property name="window_extra_style"></property>
                 <property name="window_name"></property>
                 <property name="window_style"></property>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">File</property>
                     <property name="name">menu_file</property>
                     <property name="permission">protected</property>
                 </object>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">Edit</property>
                     <property name="name">menu_edit</property>
                     <property name="permission">protected</property>
                 </object>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">View</property>
                     <property name="name">menu_view</property>
                     <property name="permission">protected</property>
                 </object>
-                <object class="wxMenu" expanded="1">
+                <object class="wxMenu" expanded="0">
                     <property name="label">Help</property>
                     <property name="name">menu_help</property>
                     <property name="permission">protected</property>
@@ -122,7 +122,7 @@
                 <property name="window_name"></property>
                 <property name="window_style"></property>
             </object>
-            <object class="wxToolBar" expanded="1">
+            <object class="wxToolBar" expanded="0">
                 <property name="BottomDockable">1</property>
                 <property name="LeftDockable">1</property>
                 <property name="RightDockable">1</property>
@@ -178,7 +178,7 @@
                 <property name="window_extra_style"></property>
                 <property name="window_name"></property>
                 <property name="window_style"></property>
-                <object class="tool" expanded="1">
+                <object class="tool" expanded="0">
                     <property name="bitmap">Load From Art Provider; wxART_GO_HOME; wxART_TOOLBAR</property>
                     <property name="context_menu">0</property>
                     <property name="id">wxID_ANY</property>
@@ -189,7 +189,7 @@
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
                 </object>
-                <object class="tool" expanded="1">
+                <object class="tool" expanded="0">
                     <property name="bitmap">Load From Art Provider; wxART_GO_FORWARD; wxART_TOOLBAR</property>
                     <property name="context_menu">0</property>
                     <property name="id">wxID_ANY</property>
@@ -1183,7 +1183,7 @@
                                             <property name="dock_fixed">0</property>
                                             <property name="docking">Left</property>
                                             <property name="enabled">1</property>
-                                            <property name="fg">wxSYS_COLOUR_WINDOW</property>
+                                            <property name="fg">wxSYS_COLOUR_BTNTEXT</property>
                                             <property name="floatable">1</property>
                                             <property name="font"></property>
                                             <property name="gripper">0</property>
